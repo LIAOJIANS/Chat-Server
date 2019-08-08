@@ -1,24 +1,50 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+// 引入Model
+const { UserModel } = require('../db/model')
+const md5 = require('blueimp-md5')
+const filter = { password: 0, __v: 0 } // 指定过滤的属性
+
 // 用户注册路由
 router.post('/register', function (req, res) {
     // 1、获取请求参数
-    const { username, password } = req.body
-    // 2、判断是否已经注册过
-    if(username === 'admin') {
-      // 返回相应数据（失败）
-      res.send({code: 1, msg: '此用户已存在'})
-    } else {
-      // 返回相应数据（成功）
-      res.send({code: 0, data: {id: 'abc123', username, password}})
+    const { username, password, type } = req.body
+    if (!username) {
+        res.send({ code: 1, msg: '用户名没有指定！' })
+        return
+    } else if (!password) {
+        res.send({ code: 1, msg: '密码没有指定！' })
+        return
+    } else if (!type) {
+        res.send({ code: 1, msg: '类型没有指定！' })
+        return;
     }
+    // 2、判断是否已经注册过
+    UserModel.findOne({ username }, function (err, user) {
+        if (user) { // 如果存在
+            res.send({ code: 1, msg: '此用户已注册！' }) // 返回信息
+        } else { // 不存在
+            // 向数据库存储数据
+            new UserModel({ username, type, password: md5(password) }).save(function (err, user) {
+                res.cookie('userid', user._id, { maxAge: 1000*60*60*24 }) // 存储一天的cookie信息
+                res.send({ code: 0, data: { username, type, _id: user._id } })
+            })
+        }
+    })
 })
-
+// 用户登录路由
+router.post('/login', function (req, res) {
+    const { username, password } = req.body
+    UserModel.findOne({ username, password: md5(password) }, filter, function (err, user) {
+        if (user) {
+            res.cookie('userid', user._id, { maxAge: 1000*60*60*24 }) // 存储一天的cookie信息
+            res.send({ code: 0, data: user })
+        } else {
+            res.send({ code: 1, msg: '用户名或密码不正确！' }) // 返回信息
+        }
+    })
+})
 
 
 module.exports = router;
