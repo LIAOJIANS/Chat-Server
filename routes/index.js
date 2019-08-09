@@ -51,7 +51,7 @@ router.post('/login', function (req, res) {
 router.post('/updata', function (req, res) {
     // 1、获取用户要修改的信息集合
     const user = req.body
-    // 2、判断用户是否在登录状态
+    // 2、判断用户是否在 登录状态
     const userid = req.cookies.userid
     if(!userid) {
         return res.send({ code: 1, msg: '未登录' })
