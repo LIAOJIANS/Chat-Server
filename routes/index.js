@@ -33,6 +33,7 @@ router.post('/register', function (req, res) {
         }
     })
 })
+
 // 用户登录路由
 router.post('/login', function (req, res) {
     const { username, password } = req.body
@@ -42,6 +43,33 @@ router.post('/login', function (req, res) {
             res.send({ code: 0, data: user })
         } else {
             res.send({ code: 1, msg: '用户名或密码不正确！' }) // 返回信息
+        }
+    })
+})
+
+// 用户完善信路由
+router.post('/updata', function (req, res) {
+    // 1、获取用户要修改的信息集合
+    const user = req.body
+    // 2、判断用户是否在登录状态
+    const userid = req.cookies.userid
+    if(!userid) {
+        return res.send({ code: 1, msg: '未登录' })
+    }
+    // 3、根据userid去修改用户信息
+    UserModel.findByIdAndUpdate({ _id: userid }, user, function (err, OldUser) {
+        // 判断是否有这位老哥
+        if(!OldUser) {
+            // 清除cookie
+            res.clearColor('userid')
+            // 返回信息
+            res.send({ code: 1, msg: '未登录' })
+        } else {
+            // 准备一个返回user数据对象
+            const { _id, username, type } = OldUser
+            // 组合返回数组
+            const data = Object.assign({ _id, username, type }, user)
+            res.send({ code: 0, data })
         }
     })
 })
