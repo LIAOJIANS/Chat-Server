@@ -74,5 +74,22 @@ router.post('/updata', function (req, res) {
     })
 })
 
+// 获取当前用户的信息
+router.get('/user', function (req, res) {
+    // 1、判断用户是否在 登录状态
+    const userid = req.cookies.userid
+    if(!userid) {
+        res.send({ code: 1, msg: '未登录' })
+    }
+    UserModel.findOne({ _id: userid }, filter, function (err, user) {
+        res.send({ code: 0, data: user })
+    })
+})
+
+// 退出登录
+// router.get('/logout', function (req, res) {
+//
+// })
+
 
 module.exports = router;
