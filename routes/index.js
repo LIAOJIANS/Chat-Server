@@ -86,10 +86,13 @@ router.get('/user', function (req, res) {
     })
 })
 
-// 退出登录
-// router.get('/logout', function (req, res) {
-//
-// })
+// 根据用户类型获取用户列表
+router.get('/userlist', function (req, res) {
+    const { type } = req.query
+    UserModel.find({ type }, filter, function (err, userList) {
+        res.send({ code: 0, data: userList })
+    })
+})
 
 
 module.exports = router;
