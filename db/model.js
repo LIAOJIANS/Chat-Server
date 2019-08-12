@@ -34,3 +34,20 @@ const UserModel = mongoose.model('user', userSchema)
 
 // 2.3 向外暴露一个Model
 exports.UserModel = UserModel // 用户信息Model
+
+
+// 定义聊天的Model
+const chatSchema = mongoose.Schema({
+    from: { type: String, require: true }, // 发送用户ID
+    to: { type: String, require: true }, // 接收用户ID
+    chat_id: { type: String, require: true }, // from和to组成的字符串
+    content: { type: String, require: true }, // 发送内容
+    read: { type: Boolean, default: false }, // 是否阅读
+    create_time: { type: Number }, // 聊天创建时间
+})
+
+// 定义Model
+const ChatModel = mongoose.model('chat', chatSchema)
+
+// 向外暴露Model
+exports.ChatModel = ChatModel

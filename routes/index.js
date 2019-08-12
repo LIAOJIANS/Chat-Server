@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 // 引入Model
-const { UserModel } = require('../db/model')
+const { UserModel, ChatModel } = require('../db/model')
 const md5 = require('blueimp-md5')
 const filter = { password: 0, __v: 0 } // 指定过滤的属性
 
@@ -94,5 +94,33 @@ router.get('/userlist', function (req, res) {
     })
 })
 
+// 获取聊天信息列表
+router.get('/msglist', function (req, res) {
+    // 获取当前登录的cookie
+    const userid = req.cookies.userid
+    // 查询user对象
+    UserModel.find(function (err, userdDoc) {
+        // 获取所有用户的头像和名字
+         const users =  userdDoc.reduce((users, user) => {
+            users[user._id] = { username: user.username, header: user.header }
+            return users
+        }, {})
+        // 查询聊天信息
+        ChatModel.find({ '$or': [ { from: userid }, { to: userid } ] }, function (err, chatMsgs) {
+            res.send({ code: 0, data: { users, chatMsgs } })
+        })
+    })
+})
+
+// 修改指定消息为已读
+router.post('/readmsg', function (req, res) {
+    // 获取前台传来的信息
+    const { from } = req.body
+    // 获取当前登录对象
+    const userid = req.cookies.userid
+    ChatModel.updata({ from: userid, read: false }, { read: true }, { multi: true }, function (err, doc) {
+        res.send({ code: 0, data: doc.nModified }) // 更新数量
+    })
+})
 
 module.exports = router;
