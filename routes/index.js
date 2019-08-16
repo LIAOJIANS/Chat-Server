@@ -114,12 +114,11 @@ router.get('/msglist', function (req, res) {
 
 // 修改指定消息为已读
 router.post('/readmsg', function (req, res) {
-    // 获取前台传来的信息
-    const { from } = req.body
-    // 获取当前登录对象
-    const userid = req.cookies.userid
-    ChatModel.updata({ from: userid, read: false }, { read: true }, { multi: true }, function (err, doc) {
-        res.send({ code: 0, data: doc.nModified }) // 更新数量
+    // 得到请求中的from和to
+    const from = req.body.from
+    const to = req.cookies.userid
+    ChatModel.update({ from, to, read: false }, { read: true }, { multi: true }, function (err, doc) {
+        res.send({ code: 0, data: doc.nModified }) // 更新的数量
     })
 })
 
