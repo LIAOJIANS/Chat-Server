@@ -119,6 +119,7 @@ router.post('/readmsg', function (req, res) {
     const to = req.cookies.userid
     ChatModel.update({ from, to, read: false }, { read: true }, { multi: true }, function (err, doc) {
         res.send({ code: 0, data: doc.nModified }) // 更新的数量
+
     })
 })
 
