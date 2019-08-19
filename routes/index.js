@@ -117,10 +117,10 @@ router.post('/readmsg', function (req, res) {
     // 得到请求中的from和to
     const from = req.body.from
     const to = req.cookies.userid
+    console.log('from' + from, to)
     ChatModel.update({ from, to, read: false }, { read: true }, { multi: true }, function (err, doc) {
+
         res.send({ code: 0, data: doc.nModified }) // 更新的数量
-
-
     })
 })
 
