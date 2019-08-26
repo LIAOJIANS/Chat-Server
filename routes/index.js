@@ -5,7 +5,9 @@ var router = express.Router();
 const { UserModel, ChatModel } = require('../db/model')
 const md5 = require('blueimp-md5')
 const filter = { password: 0, __v: 0 } // 指定过滤的属性
-
+const city = require('../data/cities')
+const school = require('../data/shools')
+const province = require('../data/provinces')
 // 用户注册路由
 router.post('/register', function (req, res) {
     // 1、获取请求参数
@@ -122,6 +124,24 @@ router.post('/readmsg', function (req, res) {
 
         res.send({ code: 0, data: doc.nModified }) // 更新的数量
     })
+})
+
+// 选择城市
+router.get('/city', function (req, res) {
+
+    res.send({ code: 0, data: city })
+})
+
+// 选择学校
+router.get('/school', function (req, res) {
+
+    res.send({ code: 0, data: school })
+})
+
+// 选择省份
+router.get('/province', function (req, res) {
+
+    res.send({ code: 0, data: province })
 })
 
 module.exports = router;
